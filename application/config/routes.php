@@ -52,3 +52,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+$route['atividades'] = 'atividade/index';
+$route['principal/search'] = 'atividade/search';
+$route['atividades/(:num)'] = 'atividade/show/$1';
+$route['atividades/store'] = 'atividade/store';
+$route['atividades/update/(:num)'] = 'atividade/update/$1';
+$route['atividades/edit/(:num)'] = 'atividade/edit/$1';
+$route['atividades/destroy/(:num)'] = 'atividade/destroy/$1';
+$route['principal/povoar'] = 'principal/povoar';
+
