@@ -15,14 +15,15 @@ class Atividade extends CI_Controller
     public function index()
     {
         $data = [];
-        $atividades = $this->doctrine->em->getRepository("Entity\Atividade")->findAll();
+        $this->doctrine->em->initialize($atividade->getIdProjeto()); // Carrega o objeto Projeto
 
         foreach ($atividades as $atividade) {
-            $projeto = $atividade->getIdProjeto(); // Obtenha o projeto associado à atividade
+            $projeto = $atividade->getIdProjeto(); // Carrega o objeto Projeto
+
             $data[] = [
                 "id" => $atividade->getId(),
                 "descricao" => $atividade->getDescricao(),
-                "projeto" => $projeto ? $projeto->getDescricao() : 'Sem Projeto', // Exibe o nome do projeto ou "Sem Projeto" se não houver projeto associado
+                "idProjeto" => $projeto->getNome(), // Acesse o nome do projeto a partir do objeto Projeto carregado
             ];
         }
 
@@ -34,15 +35,15 @@ class Atividade extends CI_Controller
     {
         $this->load->helper('url');
         $id = $this->input->get('id'); // Get the ID from the GET request
-    
+
         // Check if an ID was provided in the search
         if (!empty($id)) {
             // Perform the search query here using the $id
             // You can use the ID to retrieve the activity from the database or perform any other search logic
-    
+
             // Example query:
             $atividade = $this->doctrine->em->find("Entity\Atividade", $id);
-    
+
             if ($atividade) {
                 // Activity found, you can display it or redirect to a specific view
                 $data['atividades'] = [$atividade]; // Put the found activity in an array for consistency with the rest of the code
@@ -52,15 +53,13 @@ class Atividade extends CI_Controller
                 // Activity not found, you can display an error message or redirect
                 echo json_encode(["error" => "Atividade não encontrada"]);
                 redirect(base_url('principal/povoar'));
-
             }
         } else {
             $this->output->set_content_type('text/html');
             redirect(base_url('principal/povoar'));
-
         }
     }
-    
+
 
     public function show($id)
     {
@@ -71,7 +70,8 @@ class Atividade extends CI_Controller
             $data[] = [
                 "id" => $atividade->getId(),
                 "descricao" => $atividade->getDescricao(),
-                // Outros campos da atividade, incluindo o projeto, se necessário.
+                "idProjeto" => $atividade->getIdProjeto(),
+
             ];
         }
 
@@ -81,8 +81,12 @@ class Atividade extends CI_Controller
     public function store()
     {
         $this->load->helper('url');
+
         // Captura a descrição do formulário
         $descricao = $this->input->post('descricao');
+
+        // Captura o ID do projeto selecionado no formulário
+        $projetoId = $this->input->post('projeto');
 
         // Verifique se a descrição não está vazia
         if (empty($descricao)) {
@@ -95,6 +99,18 @@ class Atividade extends CI_Controller
 
         // Defina a descrição da atividade
         $atividade->setDescricao($descricao);
+
+        // Obtém o objeto do projeto com base no ID
+        $projeto = $this->doctrine->em->find('Entity\Projeto', $projetoId);
+
+        // Verifica se o projeto foi encontrado
+        if (!$projeto) {
+            echo json_encode(["error" => "Projeto não encontrado"]);
+            return;
+        }
+
+        // Vincula a atividade ao projeto
+        $atividade->setIdProjeto($projeto);
 
         // Defina a hora do salvamento (você pode usar a hora atual do servidor)
         $dataHoraSalvamento = new \DateTime();
@@ -117,9 +133,11 @@ class Atividade extends CI_Controller
     {
         $this->load->helper('url');
         $atividade = $this->doctrine->em->find("Entity\Atividade", $id);
+        $projetos = $this->doctrine->em->getRepository('Entity\Projeto')->findAll();
 
         if ($atividade) {
             $data['atividade'] = $atividade;
+            $data['projetos'] = $projetos;
 
             $this->output->set_content_type('text/html');
             $this->load->view('editar_atividade_view', $data); // Carrega a view de edição com os dados da atividade
@@ -133,8 +151,22 @@ class Atividade extends CI_Controller
     {
         $this->load->helper('url');
         $descricao = $this->input->post('descricao');
+        $projetoId = $this->input->post('projeto');
+        
 
         $atividade = $this->doctrine->em->find("Entity\Atividade", $id);
+
+          // Obtém o objeto do projeto com base no ID
+          $projeto = $this->doctrine->em->find('Entity\Projeto', $projetoId);
+
+          // Verifica se o projeto foi encontrado
+          if (!$projeto) {
+              echo json_encode(["error" => "Projeto não encontrado"]);
+              return;
+          }
+  
+          // Vincula a atividade ao projeto
+          $atividade->setIdProjeto($projeto);
 
         if ($atividade) {
             $this->load->helper('url');

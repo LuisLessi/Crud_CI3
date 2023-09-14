@@ -86,7 +86,17 @@ body {
     <form method="POST" action="<?= base_url('atividades/update/' . $atividade->getId()) ?>">
         <label for="descricao">Descrição:</label>
         <input type="text" name="descricao" id="descricao" value="<?= $atividade->getDescricao() ?>">
-        <!-- Adicione outros campos do formulário conforme necessário -->
+        <div class="form-group">
+            <label for="projeto">Projeto:</label>
+            <select name="projeto" id="projeto">
+                <?php foreach ($projetos as $projeto) : ?>
+                    <?php
+                        $selected = ($projeto->getId() == $atividade->getIdProjeto()->getId()) ? 'selected' : '';
+                    ?>
+                    <option value="<?= $projeto->getId() ?>" <?= $selected ?>><?= $projeto->getDescricao() ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
         <button type="submit">Salvar</button>
     </form>

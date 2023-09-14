@@ -11,18 +11,15 @@ class Principal extends CI_Controller
 
     public function povoar()
     {
-        // Crie um novo projeto
-        $projeto = new Entity\Projeto;
-        $projeto->setDescricao("Projeto 1");
-        $this->doctrine->em->persist($projeto);
-        $this->doctrine->em->flush();
 
         // Listar todas as atividades
         $atividades = $this->doctrine->em->getRepository("Entity\Atividade")->findAll();
+        $projetos = $this->doctrine->em->getRepository('Entity\Projeto')->findAll();
 
 
         // Carregue a view principal_view.php e passe os dados das atividades como um array
         $data['atividades'] = $atividades;
+        $data['projetos'] = $projetos;
 
         $this->load->view('principal_view', $data);
     }

@@ -59,7 +59,7 @@ class Atividade{
 	}
 	
 	public function getIdProjeto(){				
-			return $this->idProjeto;
+		return $this->idProjeto; // Substitua 'getNome()' pelo nome da propriedade que deseja exibir do objeto Projeto.
 	}
 
 	public function setIdProjeto($idProjeto){				
